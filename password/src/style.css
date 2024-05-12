@@ -1,0 +1,54 @@
+.background{
+    background-image: url(back.png);
+    background-size: cover;
+    height: 730px;
+}
+.form{
+    position: absolute;
+    color: aliceblue;
+    left: 800px;
+    bottom:100px;
+}
+.form2{
+    position: absolute;
+    color: aliceblue;
+    left: 300px;
+    bottom:180px;
+  
+}
+
+
+
+
+
+.btn1{
+    position: absolute;
+    width: 100px;
+    height: 40px;
+}
+.btn2{
+
+    position: absolute;
+    left:160px;
+    width: 100px;
+    height: 40px;
+}
+.btn3{
+
+    position: absolute;
+    left:30px;
+    width: 100px;
+    height: 40px;
+}
+
+
+
+.h1{
+    position: absolute;
+    left:200px;
+    
+    height: 40px;
+    color: aliceblue;
+    bottom: 380px;
+    font-size:50px;
+}
