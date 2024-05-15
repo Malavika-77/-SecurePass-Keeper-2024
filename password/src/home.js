@@ -1,79 +1,114 @@
-// src/components/Home.js
+
+
 import './style.css'; 
 import { useState } from 'react';
 import axios from 'axios';
 
-function Home() {
-    const [recordname, setRecordname] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [masterpassword, setMasterpassword] = useState('');
-    const [recordnameToFetch, setRecordnameToFetch] = useState('');
-    const [masterpasswordToFetch, setMasterpasswordToFetch] = useState('');
-    const [fetchedPassword, setFetchedPassword] = useState('');
+function Home(){
+ 
+    const [recordname,setRecordvalue]=useState('');
+    const[username,setUsernamevalue]=useState('');
+    const [password,setPasswordvalue]=useState('');
+    const [masterpassword,setMasterpasswordvalue]=useState('');
+    const [recordname1,setRecordvalue1]=useState('');
+    const [masterpassword1,setMasterpasswordvalue1]=useState('');
 
-    const handleAddPassword = async (event) => {
+    const handleRecord =(event)=>{
+        setRecordvalue(event.target.value);
+    }
+    const handleRecord1 =(event)=>{
+        setRecordvalue1(event.target.value);
+    }
+    const handleUsername =(event)=>{
+        setUsernamevalue(event.target.value);
+    }
+    const handlePassword =(event)=>{
+        setPasswordvalue(event.target.value);
+    }
+    const handleMasterpassword=(event)=>{
+        setMasterpasswordvalue(event.target.value);
+    }
+    const handleMasterpassword1=(event)=>{
+        setMasterpasswordvalue1(event.target.value);
+    }
+    //////////////////////////////////////////////////////////////////////////////////
+    const handleSubmit=async(event)=>{
+    
         event.preventDefault();
-        if (!recordname || !username || !password || !masterpassword) {
-            alert("Fill all the fields");
-            return;
+        if(!recordname||!username||!password){
+            alert("fill the fields");
         }
-        try {
-            const params = new URLSearchParams({ recordname, username, password, masterpassword });
-            await axios.get(`/addpassword?${params.toString()}`);
-            setRecordname('');
-            setUsername('');
-            setPassword('');
-            setMasterpassword('');
-           
-        } catch (error) {
-            alert('Failed to add password. Please try again.');
+        try{
+            await axios.post('/add', { recordname, username, password, masterpassword });
+            setRecordvalue('');
+            setUsernamevalue('');
+            setPasswordvalue('');
+            setMasterpasswordvalue('');
+          
+            alert('Password added successfully');
+          } catch (error) {
+           alert('Failed to add password. Please try again.');
+          }
+        };
+        //////////////////////////////////////////////////////////////////////////
+    const handleFetch=async(event)=>{
+
+        event.preventDefault();
+       
+        if(!masterpassword1||!recordname1)
+        {
+            alert("please enter the  fields")
         }
-    };
+        try{
+            await axios.post('/fetch', { recordname1, masterpassword1 });
+            setRecordvalue1('');
+            setMasterpasswordvalue1('');
+          
+            alert('fecthed successfully');
+          } catch (error) {
+           alert('Failed Please try again.');
+          }
+        };
+
     
 
-    const handleFetchPassword = async (event) => {
-        event.preventDefault();
-        if (!recordnameToFetch || !masterpasswordToFetch) {
-            alert("Please enter all the fields");
-            return;
-        }
-        try {
-            const params = new URLSearchParams({ recordnameToFetch, masterpasswordToFetch });
-            const response = await axios.get(`/fetchdata?${params.toString()}`);
-            const { username, password } = response.data;
-            setFetchedPassword(`Username: ${username}, Password: ${password}`);
-        } catch (error) {
-            alert('Failed to fetch password. Please try again.');
-        }
-    };
+    return(
+<div className='background'>
+<h2 className='h1'>𝕻𝖆𝖘𝖘𝖜𝖔𝖗𝖉 𝕸𝖆𝖓𝖆𝖌𝖊𝖗</h2>
+<div className='form'>
+    <form onSubmit={handleSubmit} method='post' action='/add'>
+        <label >RECORD NAME</label><br></br><br></br>
+        <input type='text' name="recordname" onChange={handleRecord} value={recordname}></input><br></br><br></br>
+        <label >USERNAME NAME</label><br></br><br></br>
+        <input type='text' name="username" onChange={handleUsername} value={username}></input><br></br><br></br>
+        <label >PASSWORD</label><br></br><br></br>
+        <input type='password' name="password" onChange={handlePassword} value={password}></input><br></br><br></br>
+        <label >MASTER PASSWORD</label><br></br><br></br>
+        <input type='password' name="masterpassword" onChange={handleMasterpassword} value={masterpassword}></input><br></br><br></br>
+        <button type='submit' name='add' className='btn1'>ADD</button><br></br><br></br>
+    </form>
+    <form action='/fetch' onSubmit={handleFetch} method='post' className='form2'>
+    <label >RECORD NAME</label><br></br><br></br>
+        <input type='text' name="recordname1" onChange={handleRecord1} value={recordname1}></input><br></br><br></br>
+    <label >MASTER PASSWORD</label><br></br><br></br>
+        <input type='password' name="masterpassword1" onChange={handleMasterpassword1} value={masterpassword1}></input><br></br><br></br>
+    <button type='submit' name='fetch' className='btn3'>FETCH</button><br></br><br></br>
+    </form>
     
-    return (
-        <div className='background'>
-            <h2 className='h1'>Password Manager</h2>
-            <div className='form'>
-                <form onSubmit={handleAddPassword} className='form1'>
-                    <label>RECORD NAME</label><br /><br />
-                    <input type='text' name="recordname" onChange={(e) => setRecordname(e.target.value)} value={recordname} /><br /><br />
-                    <label>USERNAME</label><br /><br />
-                    <input type='text' name="username" onChange={(e) => setUsername(e.target.value)} value={username} /><br /><br />
-                    <label>PASSWORD</label><br /><br />
-                    <input type='password' name="password" onChange={(e) => setPassword(e.target.value)} value={password} /><br /><br />
-                    <label>MASTER PASSWORD</label><br /><br />
-                    <input type='password' name="masterpassword" onChange={(e) => setMasterpassword(e.target.value)} value={masterpassword} /><br /><br />
-                    <button type='submit' className='btn1'>ADD</button><br /><br />
-                </form>
-                <form onSubmit={handleFetchPassword} className='form2'>
-                    <label>RECORD NAME</label><br /><br />
-                    <input type='text' name="recordnameToFetch" onChange={(e) => setRecordnameToFetch(e.target.value)} value={recordnameToFetch} /><br /><br />
-                    <label>MASTER PASSWORD</label><br /><br />
-                    <input type='password' name="masterpasswordToFetch" onChange={(e) => setMasterpasswordToFetch(e.target.value)} value={masterpasswordToFetch} /><br /><br />
-                    <button type='submit' className='btn3'>FETCH</button><br /><br />
-                </form>
-                {fetchedPassword && <p>{fetchedPassword}</p>}
-            </div>
-        </div>
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
     );
 }
-
 export default Home;

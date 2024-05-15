@@ -49,6 +49,6 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
-  },
-  "proxy": "https://securepass-keeper-2024-1.onrender.com"
+  }
+ 
 }
