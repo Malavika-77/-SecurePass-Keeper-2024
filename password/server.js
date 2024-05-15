@@ -1,10 +1,17 @@
-const mongoose = require("mongoose");
+// server.js
+
 const express = require("express");
+const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
 
 const app = express(); 
-const port = 3000;
+const port = 10000;
+
+const path = require('path');
+
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname,  'build')));
 
 mongoose.connect("mongodb://localhost:27017/password_manager")
     .then(() => {
@@ -37,53 +44,48 @@ const schema = new mongoose.Schema({
 
 const pass = mongoose.model("pass", schema);
 
-const path = require('path');
-
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname,  'build')));
 ////////////////////////////
 app.get("/",async(req,res)=>{
 
     res.sendFile(path.join(__dirname, 'build','index.html'));
 
 });
-app.post("/add", async (req, res) => {
-    const { recordname, username, password, masterpassword } = req.body;
 
-    // Derive encryption key from master password
+app.get("/addpassword", async (req, res) => {
+    const { recordname, username, password, masterpassword } = req.query;
+
     const derivekey = crypto.pbkdf2Sync(masterpassword, 'salt', 1000, 32, 'sha256');
-
-    // Generate a random IV (Initialization Vector) for AES encryption
     const iv = crypto.randomBytes(16);
-
-    // Create AES cipher using derived key and IV
     const cipher = crypto.createCipheriv('aes-256-cbc', derivekey, iv);
-
-    // Encrypt the password
     let encryptedPassword = cipher.update(password, 'utf8', 'hex');
     encryptedPassword += cipher.final('hex');
 
-    const newpass = new pass({
+    const newPass = new pass({
         recordname,
         username,
         password: encryptedPassword,
         masterpassword,
-        iv: iv.toString('hex') // Store IV as a hexadecimal string
+        iv: iv.toString('hex')
     });
 
-    await newpass.save();
-    res.status(200).send('Password added successfully');
+    try {
+        await newPass.save();
+        res.status(200).send('Password added successfully');
+    } catch (error) {
+        console.error("Error adding password:", error);
+        res.status(500).send('Failed to add password. Please try again.');
+    }
 });
 
-//////////////////////////////////////////////////////////
-
-app.post("/fetch", async (req, res) => {
-    const { recordname1, masterpassword1 } = req.body;
-    console.log({ recordname1, masterpassword1 });
-    const recordname=recordname1;
+//////////////////////////////////////////////////////////////////
+app.get("/fetchdata", async (req, res) => {
+    const { recordnameToFetch, masterpasswordToFetch } = req.query;
+    console.log({ recordnameToFetch, masterpasswordToFetch });
+    const recordname=recordnameToFetch;
+    const masterpassword=masterpasswordToFetch
 
     try {
-        const entry = await pass.findOne({ recordname});
+        const entry = await pass.findOne({ recordname,masterpassword});
         console.log({ entry });
 
         if (!entry) {
@@ -91,7 +93,7 @@ app.post("/fetch", async (req, res) => {
             return res.status(404).send("Record not found");
         }
 
-        const deriveKey = crypto.pbkdf2Sync(masterpassword1, 'salt', 1000, 32, 'sha256');
+        const deriveKey = crypto.pbkdf2Sync(masterpassword, 'salt', 1000, 32, 'sha256');
         console.log({ deriveKey });
 
         const decipher = crypto.createDecipheriv('aes-256-cbc', deriveKey, Buffer.from(entry.iv, 'hex'));
@@ -108,6 +110,11 @@ app.post("/fetch", async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+
+
+
+
 
 
 app.listen(port, () => {
