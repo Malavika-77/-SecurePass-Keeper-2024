@@ -4,14 +4,14 @@ module.exports = function(app) {
     app.use(
         '/add',
         createProxyMiddleware({
-            target: 'http://localhost:10000',
+            target: 'https://securepass-keeper-2024-1.onrender.com',
             changeOrigin: true,
         })
     );
     app.use(
         '/fetch',
         createProxyMiddleware({
-            target: 'http://localhost:10000',
+            target: 'https://securepass-keeper-2024-1.onrender.com',
             changeOrigin: true,
         })
     );
